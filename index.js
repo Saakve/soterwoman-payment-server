@@ -18,7 +18,16 @@ const setDefaultPaymentMethod = async () => {
     }
 }
 
-setDefaultPaymentMethod()
+//setDefaultPaymentMethod()
+const detachCard = async () => {
+    const paymentMethod = await stripe.paymentMethods.detach(
+        'pm_1Mz4qxEDd0i4g3ymfidTvXXB'
+    )
+
+    console.log(paymentMethod)
+}
+
+detachCard()
 
 app.post("/create-setup-intent", async (req, res) => {
     const { id } = await stripe.customers.create()
