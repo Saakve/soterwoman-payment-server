@@ -77,9 +77,17 @@ async function deletePaymentMethod (req, res, next) {
     const { idcustomer, paymentMethodId } = req.params
 
     try {
+        const defaultPaymentMethodId = await getDefaultPaymentMethodId(idcustomer)
+
+        if (defaultPaymentMethodId === paymentMethodId) {
+            const error = new Error('You cannot delete the default payment method')
+            error.statusCode = 400
+            throw error
+        }
+
         await stripe.customers.retrieve(idcustomer)
         await stripe.paymentMethods.detach(paymentMethodId)
-        
+
         res.sendStatus(204)
 
     } catch (e) { next(e) }
