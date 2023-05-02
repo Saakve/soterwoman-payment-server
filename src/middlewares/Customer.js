@@ -5,11 +5,14 @@ async function createTipIntent(req, res, next) {
     const { idCustomer, amount, idAccount } = req.body
 
     try {
+        const payment_method = await getDefaultPaymentMethodId(idCustomer)
+
         const tipIntent = await stripe.paymentIntents.create({
             amount,
             currency: 'usd',
             automatic_payment_methods: { enabled: true },
             customer: idCustomer,
+            payment_method,
             transfer_data: {
                 destination: idAccount,
             }
