@@ -1,6 +1,24 @@
 const { stripe } = require('../helpers/stripe')
 const { getDefaultPaymentMethodId, setDefaultPaymentMethod, updatePaymentMethod } = require('../helpers/paymentMethod')
 
+async function createTipIntent(req, res, next) {
+    const { idCustomer, amount, idAccount } = req.body
+
+    try {
+        const tipIntent = await stripe.paymentIntents.create({
+            amount,
+            currency: 'usd',
+            automatic_payment_methods: { enabled: true },
+            customer: idCustomer,
+            transfer_data: {
+                destination: idAccount,
+            }
+        })
+
+        res.send({tipIntent: tipIntent.client_secret})
+    } catch (error) { next(error) }
+}
+
 async function createSetupIntentForNewCustomer(req, res, next) {
     try {
         const { id } = await stripe.customers.create()
@@ -27,7 +45,7 @@ async function createSetupIntentForCustomer(req, res, next) {
     } catch (e) { next(e) }
 }
 
-async function getPaymentMethodsForCostumer  (req, res, next) {
+async function getPaymentMethodsForCostumer(req, res, next) {
     const { idcustomer } = req.params
     try {
         const { data } = await stripe.customers.listPaymentMethods(idcustomer, { type: 'card' })
@@ -49,7 +67,7 @@ async function getPaymentMethodsForCostumer  (req, res, next) {
     } catch (e) { next(e) }
 }
 
-async function updatePaymentMethodForCustomer (req, res, next) {
+async function updatePaymentMethodForCustomer(req, res, next) {
     const { paymentMethodId, idcustomer } = req.params
     const { name, postal_code, isDefault } = req.body
     try {
@@ -73,7 +91,7 @@ async function updatePaymentMethodForCustomer (req, res, next) {
     } catch (e) { next(e) }
 }
 
-async function deletePaymentMethod (req, res, next) {
+async function deletePaymentMethod(req, res, next) {
     const { idcustomer, paymentMethodId } = req.params
 
     try {
@@ -99,4 +117,5 @@ module.exports = {
     deletePaymentMethod,
     createSetupIntentForNewCustomer,
     createSetupIntentForCustomer,
+    createTipIntent
 }

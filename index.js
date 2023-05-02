@@ -14,6 +14,8 @@ app.use(express.json())
 app.get("/public-key", getPublishableKey)
 
 // Passenger middlewares
+app.post("/create-tip-intent", Customer.createTipIntent)
+
 app.post("/create-setup-intent", Customer.createSetupIntentForNewCustomer)
 
 app.post("/create-setup-intent/:idcustomer", Customer.createSetupIntentForCustomer)
