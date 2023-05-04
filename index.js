@@ -27,6 +27,8 @@ app.post("/create-setup-intent/:idcustomer", Customer.createSetupIntentForCustom
 
 app.get("/customers/:idcustomer/payment-methods", Customer.getPaymentMethodsForCostumer)
 
+app.get("/customers/:idcustomer/payment-methods/default", Customer.getDefaultPaymentMethodForCostumer)
+
 app.patch("/customers/:idcustomer/payment-methods/:paymentMethodId", Customer.updatePaymentMethodForCustomer)
 
 app.delete("/customers/:idcustomer/payment-methods/:paymentMethodId", Customer.deletePaymentMethod)
@@ -37,6 +39,8 @@ app.post("/create-account-card", Account.addCardForNewAccount)
 app.post("/create-account-card/:idaccount", Account.addCardForAccount)
 
 app.get("/accounts/:idaccount/cards", Account.getCardsForAccount)
+
+app.get("/accounts/:idaccount/cards/default", Account.getDefaultCardForAccount)
 
 app.patch("/accounts/:idaccount/cards/:idcard", Account.updateCardForAccount)
 

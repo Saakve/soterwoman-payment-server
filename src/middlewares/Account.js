@@ -62,7 +62,7 @@ async function addCardForAccount(req, res, next) {
             idaccount,
             {
                 external_account: tokenCard,
-                default_for_currency: true 
+                default_for_currency: true
             }
         )
 
@@ -97,6 +97,38 @@ async function getCardsForAccount(req, res, next) {
     } catch (error) { next(error) }
 }
 
+async function getDefaultCardForAccount(req, res, next) {
+    const { idaccount } = req.params
+
+    try {
+        const { data } = await stripe.accounts.listExternalAccounts(
+            idaccount,
+            { object: 'card' }
+        )
+
+        const {
+            id,
+            brand,
+            last4,
+            name,
+            address_zip,
+            default_for_currency
+        } = data.find(({ default_for_currency }) => default_for_currency)
+
+        const defaultCard = {
+            id,
+            brand,
+            last4,
+            name,
+            postal_code: address_zip,
+            isDefault: default_for_currency
+        }
+
+        res.send(defaultCard)
+
+    } catch (error) { next(error) }
+}
+
 async function updateCardForAccount(req, res, next) {
     const { idaccount, idcard } = req.params
     const { name, postal_code, isDefault } = req.body
@@ -117,7 +149,7 @@ async function deleteCardForAccount(req, res, next) {
     const { idaccount, idcard } = req.params
 
     try {
-        await stripe.accounts.deleteExternalAccount( idaccount, idcard)
+        await stripe.accounts.deleteExternalAccount(idaccount, idcard)
         res.sendStatus(204)
 
     } catch (error) { next(error) }
@@ -127,6 +159,7 @@ module.exports = {
     addCardForAccount,
     addCardForNewAccount,
     getCardsForAccount,
+    getDefaultCardForAccount,
     updateCardForAccount,
     deleteCardForAccount
 }

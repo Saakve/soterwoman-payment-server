@@ -18,7 +18,7 @@ async function createTipIntent(req, res, next) {
             }
         })
 
-        res.send({tipIntent: tipIntent.client_secret})
+        res.send({ tipIntent: tipIntent.client_secret })
     } catch (error) { next(error) }
 }
 
@@ -70,6 +70,27 @@ async function getPaymentMethodsForCostumer(req, res, next) {
     } catch (e) { next(e) }
 }
 
+async function getDefaultPaymentMethodForCostumer(req, res, next) {
+    const { idcustomer } = req.params
+    try {
+        const defaultPaymentMethodId = await getDefaultPaymentMethodId(idcustomer)
+
+        const { id, billing_details, card } = await stripe.paymentMethods.retrieve(defaultPaymentMethodId)
+
+        const defaultPaymentMethod = {
+            id,
+            brand: card.brand,
+            last4: card.last4,
+            name: billing_details.name,
+            postal_code: billing_details.address.postal_code,
+            isDefault: true
+        }
+
+        res.send(defaultPaymentMethod)
+
+    } catch (e) { next(e) }
+}
+
 async function updatePaymentMethodForCustomer(req, res, next) {
     const { paymentMethodId, idcustomer } = req.params
     const { name, postal_code, isDefault } = req.body
@@ -116,6 +137,7 @@ async function deletePaymentMethod(req, res, next) {
 
 module.exports = {
     getPaymentMethodsForCostumer,
+    getDefaultPaymentMethodForCostumer,
     updatePaymentMethodForCustomer,
     deletePaymentMethod,
     createSetupIntentForNewCustomer,
