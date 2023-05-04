@@ -1,17 +1,22 @@
 const env = require("dotenv").config()
 const express = require("express")
 
-const Customer = require('./src/middlewares/Customer.js')
-const Account = require('./src/middlewares/Account.js')
-const handleNotFound = require('./src/middlewares/handleNotFound.js')
-const handleError = require("./src/middlewares/handleErrors.js")
-const getPublishableKey = require("./src/middlewares/getPublishableKey.js")
+const Customer = require('./src/middlewares/Customer')
+const Account = require('./src/middlewares/Account')
+const General = require('./src/middlewares/General')
+
+const handleNotFound = require('./src/middlewares/handleNotFound')
+const handleError = require("./src/middlewares/handleErrors")
+const getPublishableKey = require("./src/middlewares/getPublishableKey")
 
 const app = express()
 
 app.use(express.json())
 
 app.get("/public-key", getPublishableKey)
+
+// General middlewares
+app.post("/payoff-debt", General.payoffDebt)
 
 // Passenger middlewares
 app.post("/create-tip-intent", Customer.createTipIntent)
