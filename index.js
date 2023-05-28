@@ -19,6 +19,8 @@ app.get("/public-key", getPublishableKey)
 app.post("/payoff-debt", General.payoffDebt)
 
 // Passenger middlewares
+app.post("/create-payment-intent", Customer.createPaymentIntent)
+
 app.post("/create-tip-intent", Customer.createTipIntent)
 
 app.post("/create-setup-intent", Customer.createSetupIntentForNewCustomer)

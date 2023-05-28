@@ -1,6 +1,28 @@
 const { stripe } = require('../helpers/stripe')
 const { getDefaultPaymentMethodId, setDefaultPaymentMethod, updatePaymentMethod } = require('../helpers/paymentMethod')
 
+async function createPaymentIntent(req, res, next) {
+    const { idCustomer, amount, idAccount } = req.body
+
+    try {
+        const payment_method = await getDefaultPaymentMethodId(idCustomer)
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency: 'usd',
+            automatic_payment_methods: { enabled: true },
+            customer: idCustomer,
+            payment_method,
+            transfer_data: {
+                destination: idAccount,
+                amount: Number.parseInt(amount * 0.75)
+            }
+        })
+
+        res.send({ paymentIntent: paymentIntent.client_secret })
+    } catch (error) { next(error) }
+}
+
 async function createTipIntent(req, res, next) {
     const { idCustomer, amount, idAccount } = req.body
 
@@ -142,5 +164,6 @@ module.exports = {
     deletePaymentMethod,
     createSetupIntentForNewCustomer,
     createSetupIntentForCustomer,
-    createTipIntent
+    createTipIntent,
+    createPaymentIntent
 }
